@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mic, MicOff } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
+import { useDictation } from "@/hooks/useDictation";
 import { withRetry } from "@/lib/retry";
 import { startRound, submitRound } from "@/lib/interview.functions";
 import { roundBySlug } from "@/lib/rounds";
@@ -55,6 +56,26 @@ function InterviewPage() {
   const [phase, setPhase] = useState<"idle" | "loading" | "running" | "grading">("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
 
+  const indexRef = useRef(index);
+  indexRef.current = index;
+  const appendSpeech = useCallback((text: string) => {
+    if (!text) return;
+    setAnswers((prev) => {
+      const next = [...prev];
+      const i = indexRef.current;
+      const existing = next[i] ?? "";
+      next[i] = existing ? `${existing.replace(/\s+$/, "")} ${text}` : text;
+      return next;
+    });
+  }, []);
+  const dictation = useDictation(appendSpeech);
+  const stopDictation = dictation.stop;
+
+  // Never keep the mic open across questions or after leaving the round.
+  useEffect(() => {
+    stopDictation();
+  }, [index, phase, stopDictation]);
+
   useEffect(() => {
     if (!loading && !session) navigate({ to: "/auth" });
   }, [loading, session, navigate]);
@@ -84,6 +105,7 @@ function InterviewPage() {
 
   async function submit() {
     if (!sessionId) return;
+    stopDictation();
     setPhase("grading");
     try {
       await withRetry(() => finish({ data: { id: sessionId, answers } }));
@@ -185,17 +207,45 @@ function InterviewPage() {
                     ))}
                   </RadioGroup>
                 ) : (
-                  <Textarea
-                    className="mt-6"
-                    rows={9}
-                    placeholder="Answer as you would out loud in the interview…"
-                    value={answers[index] ?? ""}
-                    onChange={(e) => {
-                      const next = [...answers];
-                      next[index] = e.target.value;
-                      setAnswers(next);
-                    }}
-                  />
+                  <div className="mt-6">
+                    <Textarea
+                      rows={9}
+                      placeholder="Answer as you would out loud in the interview…"
+                      value={
+                        dictation.interim
+                          ? `${answers[index] ?? ""}${answers[index] ? " " : ""}${dictation.interim}`
+                          : (answers[index] ?? "")
+                      }
+                      onChange={(e) => {
+                        const next = [...answers];
+                        next[index] = e.target.value;
+                        setAnswers(next);
+                      }}
+                    />
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <Button
+                        type="button"
+                        variant={dictation.listening ? "default" : "outline"}
+                        size="sm"
+                        disabled={!dictation.supported}
+                        onClick={dictation.toggle}
+                      >
+                        {dictation.listening ? (
+                          <MicOff className="mr-2 h-4 w-4" />
+                        ) : (
+                          <Mic className="mr-2 h-4 w-4" />
+                        )}
+                        {dictation.listening ? "Stop recording" : "Answer by voice"}
+                      </Button>
+                      <span className="text-muted-foreground text-xs">
+                        {!dictation.supported
+                          ? "Voice answering needs Chrome, Edge or Safari."
+                          : dictation.listening
+                            ? "Listening… speak your answer, then stop to edit it."
+                            : "Speak your answer and we'll transcribe it into the box."}
+                      </span>
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>
