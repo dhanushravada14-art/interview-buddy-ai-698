@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { withRetry } from "@/lib/retry";
 import { getProfile, saveProfile } from "@/lib/interview.functions";
 
 const title = "Your student profile — PrepRounds";
