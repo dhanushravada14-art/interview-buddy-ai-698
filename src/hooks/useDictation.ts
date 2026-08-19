@@ -1,13 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+type SpeechResultLike = {
+  isFinal: boolean;
+  [index: number]: { transcript?: string } | undefined;
+};
+
+type SpeechResultEvent = {
+  resultIndex: number;
+  results: ArrayLike<SpeechResultLike>;
+};
+
 type SpeechRecognitionLike = {
   lang: string;
   continuous: boolean;
   interimResults: boolean;
   start: () => void;
   stop: () => void;
-  onresult: ((event: any) => void) | null;
-  onerror: ((event: any) => void) | null;
+  onresult: ((event: SpeechResultEvent) => void) | null;
+  onerror: ((event: unknown) => void) | null;
   onend: (() => void) | null;
 };
 
@@ -52,10 +62,11 @@ export function useDictation(onFinal: (text: string) => void) {
     rec.lang = "en-IN";
     rec.continuous = true;
     rec.interimResults = true;
-    rec.onresult = (event: any) => {
+    rec.onresult = (event: SpeechResultEvent) => {
       let pending = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
+        if (!result) continue;
         const text = String(result[0]?.transcript ?? "");
         if (result.isFinal) finalRef.current(text.trim());
         else pending += text;
