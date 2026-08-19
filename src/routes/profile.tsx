@@ -71,7 +71,7 @@ function ProfilePage() {
   }, [data]);
 
   const save = useMutation({
-    mutationFn: () => persist({ data: { ...form, skills } }),
+    mutationFn: () => withRetry(() => persist({ data: { ...form, skills } })),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
       toast.success("Profile saved — your questions will adapt to this.");
