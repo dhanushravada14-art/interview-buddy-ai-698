@@ -45,7 +45,6 @@ function InterviewPage() {
   const { slug } = Route.useParams();
   const meta = roundBySlug(slug);
   const navigate = useNavigate();
-  const { session, loading } = useAuth();
   const begin = useServerFn(startRound);
   const finish = useServerFn(submitRound);
 
@@ -75,10 +74,6 @@ function InterviewPage() {
   useEffect(() => {
     stopDictation();
   }, [index, phase, stopDictation]);
-
-  useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
-  }, [loading, session, navigate]);
 
   useEffect(() => {
     if (phase !== "running" || secondsLeft <= 0) return;
