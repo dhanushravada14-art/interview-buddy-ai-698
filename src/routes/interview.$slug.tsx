@@ -67,7 +67,7 @@ function InterviewPage() {
   async function start() {
     setPhase("loading");
     try {
-      const row = await begin({ data: { slug } });
+      const row = await withRetry(() => begin({ data: { slug } }));
       const qs = (row.questions ?? []) as Question[];
       setSessionId(row.id);
       setQuestions(qs);
@@ -85,7 +85,7 @@ function InterviewPage() {
     if (!sessionId) return;
     setPhase("grading");
     try {
-      await finish({ data: { id: sessionId, answers } });
+      await withRetry(() => finish({ data: { id: sessionId, answers } }));
       navigate({ to: "/results/$id", params: { id: sessionId } });
     } catch (e) {
       setPhase("running");
