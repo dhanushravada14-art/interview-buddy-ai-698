@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
+import { withRetry } from "@/lib/retry";
 import { startRound, submitRound } from "@/lib/interview.functions";
 import { roundBySlug } from "@/lib/rounds";
 
