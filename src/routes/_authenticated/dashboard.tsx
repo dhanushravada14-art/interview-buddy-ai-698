@@ -1,13 +1,11 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useAuth } from "@/hooks/useAuth";
 import { getProfile, listSessions } from "@/lib/interview.functions";
 import { ROUNDS, scoreLabel } from "@/lib/rounds";
 
@@ -28,24 +26,16 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
-  const { session, loading } = useAuth();
-  const navigate = useNavigate();
   const fetchSessions = useServerFn(listSessions);
   const fetchProfile = useServerFn(getProfile);
-
-  useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
-  }, [loading, session, navigate]);
 
   const { data: sessions } = useQuery({
     queryKey: ["sessions"],
     queryFn: () => fetchSessions({}),
-    enabled: !!session,
   });
   const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: () => fetchProfile({}),
-    enabled: !!session,
   });
 
   const profileReady = !!profile && (profile.skills?.length ?? 0) > 0 && !!profile.projects;
