@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
 import { withRetry } from "@/lib/retry";
 import { getProfile, saveProfile } from "@/lib/interview.functions";
 
@@ -31,7 +30,6 @@ export const Route = createFileRoute("/_authenticated/profile")({
 });
 
 function ProfilePage() {
-  const { session, loading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const fetchProfile = useServerFn(getProfile);
@@ -48,14 +46,9 @@ function ProfilePage() {
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
 
-  useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
-  }, [loading, session, navigate]);
-
   const { data } = useQuery({
     queryKey: ["profile"],
     queryFn: () => fetchProfile({}),
-    enabled: !!session,
   });
 
   useEffect(() => {
