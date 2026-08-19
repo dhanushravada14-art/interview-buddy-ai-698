@@ -11,10 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as InterviewSlugRouteImport } from './routes/interview.$slug'
-import { Route as ResultsIdRouteImport } from './routes/results.$id'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedInterviewSlugRouteImport } from './routes/_authenticated/interview.$slug'
+import { Route as AuthenticatedResultsIdRouteImport } from './routes/_authenticated/results.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -26,23 +26,24 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/_authenticated/dashboard',
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/_authenticated/profile',
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InterviewSlugRoute = InterviewSlugRouteImport.update({
-  id: '/interview/$slug',
-  path: '/interview/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResultsIdRoute = ResultsIdRouteImport.update({
-  id: '/results/$id',
+const AuthenticatedInterviewSlugRoute =
+  AuthenticatedInterviewSlugRouteImport.update({
+    id: '/_authenticated/interview/$slug',
+    path: '/interview/$slug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedResultsIdRoute = AuthenticatedResultsIdRouteImport.update({
+  id: '/_authenticated/results/$id',
   path: '/results/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -50,27 +51,27 @@ const ResultsIdRoute = ResultsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
-  '/profile': typeof ProfileRoute
-  '/interview/$slug': typeof InterviewSlugRoute
-  '/results/$id': typeof ResultsIdRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
+  '/results/$id': typeof AuthenticatedResultsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
-  '/profile': typeof ProfileRoute
-  '/interview/$slug': typeof InterviewSlugRoute
-  '/results/$id': typeof ResultsIdRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
+  '/results/$id': typeof AuthenticatedResultsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
-  '/profile': typeof ProfileRoute
-  '/interview/$slug': typeof InterviewSlugRoute
-  '/results/$id': typeof ResultsIdRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/interview/$slug': typeof AuthenticatedInterviewSlugRoute
+  '/_authenticated/results/$id': typeof AuthenticatedResultsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -93,19 +94,19 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
-    | '/dashboard'
-    | '/profile'
-    | '/interview/$slug'
-    | '/results/$id'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/profile'
+    | '/_authenticated/interview/$slug'
+    | '/_authenticated/results/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  DashboardRoute: typeof DashboardRoute
-  ProfileRoute: typeof ProfileRoute
-  InterviewSlugRoute: typeof InterviewSlugRoute
-  ResultsIdRoute: typeof ResultsIdRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedInterviewSlugRoute: typeof AuthenticatedInterviewSlugRoute
+  AuthenticatedResultsIdRoute: typeof AuthenticatedResultsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -124,32 +125,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/profile': {
-      id: '/profile'
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
       path: '/profile'
       fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/interview/$slug': {
-      id: '/interview/$slug'
+    '/_authenticated/interview/$slug': {
+      id: '/_authenticated/interview/$slug'
       path: '/interview/$slug'
       fullPath: '/interview/$slug'
-      preLoaderRoute: typeof InterviewSlugRouteImport
+      preLoaderRoute: typeof AuthenticatedInterviewSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/results/$id': {
-      id: '/results/$id'
+    '/_authenticated/results/$id': {
+      id: '/_authenticated/results/$id'
       path: '/results/$id'
       fullPath: '/results/$id'
-      preLoaderRoute: typeof ResultsIdRouteImport
+      preLoaderRoute: typeof AuthenticatedResultsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -158,10 +159,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  DashboardRoute: DashboardRoute,
-  ProfileRoute: ProfileRoute,
-  InterviewSlugRoute: InterviewSlugRoute,
-  ResultsIdRoute: ResultsIdRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedInterviewSlugRoute: AuthenticatedInterviewSlugRoute,
+  AuthenticatedResultsIdRoute: AuthenticatedResultsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

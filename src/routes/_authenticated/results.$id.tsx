@@ -15,7 +15,7 @@ const title = "Round result — PrepRounds";
 const description =
   "Your marks, per-question feedback and ideal answers for this mock interview round.";
 
-export const Route = createFileRoute("/results/$id")({
+export const Route = createFileRoute("/_authenticated/results/$id")({
   head: () => ({
     meta: [
       { title },

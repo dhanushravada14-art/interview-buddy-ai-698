@@ -16,7 +16,7 @@ import { withRetry } from "@/lib/retry";
 import { startRound, submitRound } from "@/lib/interview.functions";
 import { roundBySlug } from "@/lib/rounds";
 
-export const Route = createFileRoute("/interview/$slug")({
+export const Route = createFileRoute("/_authenticated/interview/$slug")({
   head: ({ params }) => {
     const meta = roundBySlug(params.slug);
     const title = `${meta?.name ?? "Mock interview"} — PrepRounds`;

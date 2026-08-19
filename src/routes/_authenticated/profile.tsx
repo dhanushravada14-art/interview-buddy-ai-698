@@ -18,7 +18,7 @@ const title = "Your student profile — PrepRounds";
 const description =
   "Add your degree, target role, skills and projects so every mock interview question is generated around you.";
 
-export const Route = createFileRoute("/profile")({
+export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
       { title },

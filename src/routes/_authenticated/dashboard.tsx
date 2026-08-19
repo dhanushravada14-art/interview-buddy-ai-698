@@ -15,7 +15,7 @@ const title = "Dashboard — PrepRounds Mock Interviews";
 const description =
   "Start any of the four mock interview rounds and review the marks and feedback from your past attempts.";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title },
