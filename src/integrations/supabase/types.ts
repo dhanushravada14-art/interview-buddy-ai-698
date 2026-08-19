@@ -14,7 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      interview_sessions: {
+        Row: {
+          answers: Json
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          feedback: string | null
+          id: string
+          per_question: Json
+          questions: Json
+          round: number
+          round_name: string
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          per_question?: Json
+          questions?: Json
+          round: number
+          round_name: string
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          per_question?: Json
+          questions?: Json
+          round?: number
+          round_name?: string
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          college: string
+          created_at: string
+          degree: string
+          full_name: string
+          graduation_year: string
+          id: string
+          projects: string
+          skills: string[]
+          target_role: string
+          updated_at: string
+        }
+        Insert: {
+          college?: string
+          created_at?: string
+          degree?: string
+          full_name?: string
+          graduation_year?: string
+          id: string
+          projects?: string
+          skills?: string[]
+          target_role?: string
+          updated_at?: string
+        }
+        Update: {
+          college?: string
+          created_at?: string
+          degree?: string
+          full_name?: string
+          graduation_year?: string
+          id?: string
+          projects?: string
+          skills?: string[]
+          target_role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
