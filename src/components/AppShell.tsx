@@ -1,4 +1,3 @@
-<<<<<<<<<<PATCHSEP>>>>>>>>>>
 import { Link, useNavigate } from "@tanstack/react-router";
 import { GraduationCap, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
