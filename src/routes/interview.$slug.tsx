@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
+import { withRetry } from "@/lib/retry";
 import { startRound, submitRound } from "@/lib/interview.functions";
 import { roundBySlug } from "@/lib/rounds";
 
@@ -67,7 +68,7 @@ function InterviewPage() {
   async function start() {
     setPhase("loading");
     try {
-      const row = await begin({ data: { slug } });
+      const row = await withRetry(() => begin({ data: { slug } }));
       const qs = (row.questions ?? []) as Question[];
       setSessionId(row.id);
       setQuestions(qs);
@@ -85,7 +86,7 @@ function InterviewPage() {
     if (!sessionId) return;
     setPhase("grading");
     try {
-      await finish({ data: { id: sessionId, answers } });
+      await withRetry(() => finish({ data: { id: sessionId, answers } }));
       navigate({ to: "/results/$id", params: { id: sessionId } });
     } catch (e) {
       setPhase("running");
