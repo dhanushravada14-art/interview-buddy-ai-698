@@ -100,11 +100,21 @@ function AuthPage() {
               <TabsContent value="signin" className="mt-6 space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="pw">Password</Label>
-                  <Input id="pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <Input
+                    id="pw"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                 </div>
                 <Button className="w-full" disabled={busy} onClick={signIn}>
                   Sign in
@@ -118,11 +128,21 @@ function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email2">Email</Label>
-                  <Input id="email2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <Input
+                    id="email2"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="pw2">Password</Label>
-                  <Input id="pw2" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <Input
+                    id="pw2"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                 </div>
                 <Button className="w-full" disabled={busy} onClick={signUp}>
                   Create account
@@ -131,7 +151,8 @@ function AuthPage() {
             </Tabs>
 
             <div className="text-muted-foreground my-6 flex items-center gap-3 text-xs">
-              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+              <span className="h-px flex-1 bg-border" /> or{" "}
+              <span className="h-px flex-1 bg-border" />
             </div>
             <Button variant="outline" className="w-full" onClick={google}>
               Continue with Google

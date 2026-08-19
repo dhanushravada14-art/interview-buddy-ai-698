@@ -100,7 +100,8 @@ Generate exactly ${meta.count} questions.${
       };
     });
 
-    if (questions.length === 0) throw new Error("The interviewer could not generate questions. Please try again.");
+    if (questions.length === 0)
+      throw new Error("The interviewer could not generate questions. Please try again.");
     return { meta: meta as RoundMeta, questions };
   } catch (error) {
     if (NoObjectGeneratedError.isInstance(error)) {
@@ -163,7 +164,10 @@ export async function gradeRound(
   }
 
   const transcript = questions
-    .map((q, i) => `Q${i + 1} (${q.topic}): ${q.question}\nCandidate answer: ${answers[i]?.trim() || "(no answer)"}`)
+    .map(
+      (q, i) =>
+        `Q${i + 1} (${q.topic}): ${q.question}\nCandidate answer: ${answers[i]?.trim() || "(no answer)"}`,
+    )
     .join("\n\n");
 
   const prompt = `You are grading ${row.round_name} for a first-time campus candidate.

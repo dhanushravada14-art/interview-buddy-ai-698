@@ -142,9 +142,7 @@ function InterviewPage() {
               <ul className="text-muted-foreground mt-6 space-y-1 text-sm">
                 <li>· {meta.count} questions</li>
                 <li>· Suggested time: {meta.minutes} minutes</li>
-                <li>
-                  · Format: {meta.format === "mcq" ? "multiple choice" : "written answers"}
-                </li>
+                <li>· Format: {meta.format === "mcq" ? "multiple choice" : "written answers"}</li>
                 <li>· Questions are generated fresh from your profile each attempt</li>
               </ul>
               <Button className="mt-8" size="lg" onClick={start}>

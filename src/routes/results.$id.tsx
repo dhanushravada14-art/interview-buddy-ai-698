@@ -12,7 +12,8 @@ import { getSession } from "@/lib/interview.functions";
 import { scoreLabel } from "@/lib/rounds";
 
 const title = "Round result — PrepRounds";
-const description = "Your marks, per-question feedback and ideal answers for this mock interview round.";
+const description =
+  "Your marks, per-question feedback and ideal answers for this mock interview round.";
 
 export const Route = createFileRoute("/results/$id")({
   head: () => ({
