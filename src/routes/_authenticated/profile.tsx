@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
 import { withRetry } from "@/lib/retry";
 import { getProfile, saveProfile } from "@/lib/interview.functions";
 
@@ -18,7 +17,7 @@ const title = "Your student profile — PrepRounds";
 const description =
   "Add your degree, target role, skills and projects so every mock interview question is generated around you.";
 
-export const Route = createFileRoute("/profile")({
+export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
       { title },
@@ -31,7 +30,6 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
-  const { session, loading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const fetchProfile = useServerFn(getProfile);
@@ -48,14 +46,9 @@ function ProfilePage() {
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
 
-  useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
-  }, [loading, session, navigate]);
-
   const { data } = useQuery({
     queryKey: ["profile"],
     queryFn: () => fetchProfile({}),
-    enabled: !!session,
   });
 
   useEffect(() => {
@@ -93,16 +86,28 @@ function ProfilePage() {
       <main className="mx-auto max-w-3xl px-4 py-12">
         <h1 className="text-3xl font-bold">Your profile</h1>
         <p className="text-muted-foreground mt-2">
-          The interviewer reads this before every round. The more specific your skills and
-          projects, the more realistic your questions.
+          The interviewer reads this before every round. The more specific your skills and projects,
+          the more realistic your questions.
         </p>
 
         <Card className="glow-panel mt-8 border-border/70">
           <CardContent className="space-y-6 p-6">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Full name" value={form.full_name} onChange={(v) => setForm({ ...form, full_name: v })} />
-              <Field label="College" value={form.college} onChange={(v) => setForm({ ...form, college: v })} />
-              <Field label="Degree / branch" value={form.degree} onChange={(v) => setForm({ ...form, degree: v })} />
+              <Field
+                label="Full name"
+                value={form.full_name}
+                onChange={(v) => setForm({ ...form, full_name: v })}
+              />
+              <Field
+                label="College"
+                value={form.college}
+                onChange={(v) => setForm({ ...form, college: v })}
+              />
+              <Field
+                label="Degree / branch"
+                value={form.degree}
+                onChange={(v) => setForm({ ...form, degree: v })}
+              />
               <Field
                 label="Graduation year"
                 value={form.graduation_year}

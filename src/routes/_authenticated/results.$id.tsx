@@ -1,20 +1,19 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useAuth } from "@/hooks/useAuth";
 import { getSession } from "@/lib/interview.functions";
 import { scoreLabel } from "@/lib/rounds";
 
 const title = "Round result — PrepRounds";
-const description = "Your marks, per-question feedback and ideal answers for this mock interview round.";
+const description =
+  "Your marks, per-question feedback and ideal answers for this mock interview round.";
 
-export const Route = createFileRoute("/results/$id")({
+export const Route = createFileRoute("/_authenticated/results/$id")({
   head: () => ({
     meta: [
       { title },
@@ -32,18 +31,11 @@ type P = { marks: number; verdict: string; ideal_answer: string };
 
 function ResultsPage() {
   const { id } = Route.useParams();
-  const { session, loading } = useAuth();
-  const navigate = useNavigate();
   const fetchSession = useServerFn(getSession);
-
-  useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
-  }, [loading, session, navigate]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["session", id],
     queryFn: () => fetchSession({ data: { id } }),
-    enabled: !!session,
   });
 
   if (isLoading || !data) {

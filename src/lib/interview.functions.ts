@@ -93,9 +93,7 @@ export const startRound = createServerFn({ method: "POST" })
 export const submitRound = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ id: z.string().uuid(), answers: z.array(z.string().max(6000)) })
-      .parse(input),
+    z.object({ id: z.string().uuid(), answers: z.array(z.string().max(6000)) }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { gradeRound } = await import("./interview.server");

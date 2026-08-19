@@ -10,13 +10,12 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/hooks/useAuth";
 import { useDictation } from "@/hooks/useDictation";
 import { withRetry } from "@/lib/retry";
 import { startRound, submitRound } from "@/lib/interview.functions";
 import { roundBySlug } from "@/lib/rounds";
 
-export const Route = createFileRoute("/interview/$slug")({
+export const Route = createFileRoute("/_authenticated/interview/$slug")({
   head: ({ params }) => {
     const meta = roundBySlug(params.slug);
     const title = `${meta?.name ?? "Mock interview"} — PrepRounds`;
@@ -45,7 +44,6 @@ function InterviewPage() {
   const { slug } = Route.useParams();
   const meta = roundBySlug(slug);
   const navigate = useNavigate();
-  const { session, loading } = useAuth();
   const begin = useServerFn(startRound);
   const finish = useServerFn(submitRound);
 
@@ -75,10 +73,6 @@ function InterviewPage() {
   useEffect(() => {
     stopDictation();
   }, [index, phase, stopDictation]);
-
-  useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
-  }, [loading, session, navigate]);
 
   useEffect(() => {
     if (phase !== "running" || secondsLeft <= 0) return;
@@ -142,9 +136,7 @@ function InterviewPage() {
               <ul className="text-muted-foreground mt-6 space-y-1 text-sm">
                 <li>· {meta.count} questions</li>
                 <li>· Suggested time: {meta.minutes} minutes</li>
-                <li>
-                  · Format: {meta.format === "mcq" ? "multiple choice" : "written answers"}
-                </li>
+                <li>· Format: {meta.format === "mcq" ? "multiple choice" : "written answers"}</li>
                 <li>· Questions are generated fresh from your profile each attempt</li>
               </ul>
               <Button className="mt-8" size="lg" onClick={start}>
