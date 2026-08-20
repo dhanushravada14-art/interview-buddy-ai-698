@@ -44,7 +44,14 @@ function AuthPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      const msg = error.message.toLowerCase();
+      if (msg.includes("not confirmed")) {
+        toast.error("This email isn't confirmed yet. Use \"Continue with Google\" with the same email, or create the account again.");
+      } else if (msg.includes("invalid login credentials")) {
+        toast.error("Wrong email or password. If you signed up with Google, use \"Continue with Google\".");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
     navigate({ to: "/dashboard" });
@@ -52,7 +59,7 @@ function AuthPage() {
 
   async function signUp() {
     setBusy(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -64,6 +71,17 @@ function AuthPage() {
     if (error) {
       toast.error(error.message);
       return;
+    }
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      toast.error("An account already exists for this email. Sign in instead, or use Continue with Google.");
+      return;
+    }
+    if (!data.session) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) {
+        toast.error(signInError.message);
+        return;
+      }
     }
     toast.success("Account created. You can start your first round.");
     navigate({ to: "/profile" });
