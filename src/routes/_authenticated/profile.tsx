@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { withRetry } from "@/lib/retry";
+import { supabase } from "@/integrations/supabase/client";
 import { getProfile, saveProfile } from "@/lib/interview.functions";
 
 const title = "Your student profile — PrepRounds";
@@ -170,8 +171,72 @@ function ProfilePage() {
             </Button>
           </CardContent>
         </Card>
+
+        <PasswordCard />
       </main>
     </AppShell>
+  );
+}
+
+function PasswordCard() {
+  const [providers, setProviders] = useState<string[]>([]);
+  const [email, setEmail] = useState("");
+  const [pw, setPw] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setEmail(data.user?.email ?? "");
+      const list = (data.user?.identities ?? []).map((i) => i.provider);
+      setProviders(list);
+    });
+  }, []);
+
+  const hasEmailLogin = providers.includes("email");
+
+  async function setPassword() {
+    if (pw.length < 6) {
+      toast.error("Use at least 6 characters.");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: pw });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setPw("");
+    toast.success(`Password set. You can now sign in with ${email} and this password.`);
+  }
+
+  return (
+    <Card className="mt-8 border-border/70">
+      <CardContent className="space-y-4 p-6">
+        <div>
+          <h2 className="text-lg font-semibold">
+            {hasEmailLogin ? "Change your password" : "Add an email password"}
+          </h2>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {hasEmailLogin
+              ? `Update the password used to sign in with ${email}.`
+              : `You signed up with Google, so ${email} has no password yet. Set one here to also sign in with email and password — it stays the same account.`}
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Input
+            type="password"
+            autoComplete="new-password"
+            placeholder="New password"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+          />
+          <Button variant="secondary" disabled={busy} onClick={setPassword}>
+            {busy ? "Saving…" : hasEmailLogin ? "Update password" : "Set password"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
