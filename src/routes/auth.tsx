@@ -48,7 +48,10 @@ function AuthPage() {
       if (msg.includes("not confirmed")) {
         toast.error("This email isn't confirmed yet. Use \"Continue with Google\" with the same email, or create the account again.");
       } else if (msg.includes("invalid login credentials")) {
-        toast.error("Wrong email or password. If you signed up with Google, use \"Continue with Google\".");
+        toast.error(
+          'Wrong email or password. If this email was created with "Continue with Google", it has no password yet — sign in with Google once, then set a password on your Profile page.',
+          { duration: 8000 },
+        );
       } else {
         toast.error(error.message);
       }
