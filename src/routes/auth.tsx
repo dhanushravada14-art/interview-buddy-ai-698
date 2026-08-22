@@ -41,7 +41,10 @@ function AuthPage() {
 
   async function signIn() {
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
     setBusy(false);
     if (error) {
       const msg = error.message.toLowerCase();
@@ -61,34 +64,51 @@ function AuthPage() {
   }
 
   async function signUp() {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || password.length < 6) {
+      toast.error("Enter a valid email and a password of at least 6 characters.");
+      return;
+    }
     setBusy(true);
+    // Password hashing, salting and storage are handled server-side by the
+    // backend auth service — never hash or store credentials in app code.
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: cleanEmail,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName.trim() },
         emailRedirectTo: `${window.location.origin}/dashboard`,
       },
     });
     setBusy(false);
+
+    // Equivalent of the "user already exists" check.
+    const alreadyRegistered =
+      error?.message.toLowerCase().includes("already registered") ||
+      (data?.user && data.user.identities && data.user.identities.length === 0);
+    if (alreadyRegistered) {
+      toast.error("Email already registered — sign in instead, or use Continue with Google.");
+      return;
+    }
     if (error) {
       toast.error(error.message);
       return;
     }
-    if (data.user && data.user.identities && data.user.identities.length === 0) {
-      toast.error("An account already exists for this email. Sign in instead, or use Continue with Google.");
-      return;
-    }
+
     if (!data.session) {
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
       if (signInError) {
         toast.error(signInError.message);
         return;
       }
     }
-    toast.success("Account created. You can start your first round.");
+    toast.success("Account created successfully.");
     navigate({ to: "/profile" });
   }
+
 
   async function google() {
     const result = await lovable.auth.signInWithOAuth("google", {
