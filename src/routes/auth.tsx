@@ -41,7 +41,10 @@ function AuthPage() {
 
   async function signIn() {
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
     setBusy(false);
     if (error) {
       const msg = error.message.toLowerCase();
