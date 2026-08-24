@@ -25,7 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             PrepRounds
           </Link>
           <nav className="flex items-center gap-1 text-sm">
-            {session ? (
+            {signedIn ? (
               <>
                 <Link to="/syllabus">
                   <Button variant="ghost" size="sm">
