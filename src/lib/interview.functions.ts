@@ -41,14 +41,17 @@ export const saveProfile = createServerFn({ method: "POST" })
 export const listSessions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("interview_sessions")
-      .select("id, round, round_name, score, completed, created_at")
-      .eq("user_id", context.userId)
-      .order("created_at", { ascending: false })
-      .limit(50);
-    if (error) throw new Error(error.message);
-    return data ?? [];
+    const { withRetry } = await import("./retry");
+    return withRetry(async () => {
+      const { data, error } = await context.supabase
+        .from("interview_sessions")
+        .select("id, round, round_name, score, completed, created_at")
+        .eq("user_id", context.userId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    });
   });
 
 export const getSession = createServerFn({ method: "POST" })
