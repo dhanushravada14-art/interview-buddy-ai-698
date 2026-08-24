@@ -276,7 +276,7 @@ function SyllabusPage() {
 
         <div className="mt-10 space-y-12">
           {ROUNDS.map((r) => {
-            const s = SYLLABI[r.round];
+            const s = SYLLABI[r.round]!;
             return (
               <section key={r.round} id={r.slug} className="scroll-mt-20">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
