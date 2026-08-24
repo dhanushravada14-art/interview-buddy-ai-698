@@ -54,7 +54,7 @@ function Index() {
               <Sparkles className="h-3.5 w-3.5" /> AI-powered placement practice
             </span>
             <h1 className="mt-6 max-w-3xl text-5xl leading-tight font-bold">
-              Walk into your first interview having already done it four times.
+              Welcome to mock interview
             </h1>
             <p className="text-muted-foreground mt-5 max-w-2xl text-lg">
               A complete mock hiring process — aptitude, managerial, technical and HR — with
