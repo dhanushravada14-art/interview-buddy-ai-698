@@ -22,6 +22,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <nav className="flex items-center gap-1 text-sm">
             {session ? (
               <>
+                <Link to="/syllabus">
+                  <Button variant="ghost" size="sm">
+                    Syllabus
+                  </Button>
+                </Link>
                 <Link to="/dashboard">
                   <Button variant="ghost" size="sm">
                     Dashboard
