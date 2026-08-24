@@ -3,11 +3,16 @@ import { GraduationCap, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { session } = useAuth();
   const navigate = useNavigate();
+  // Auth state only exists in the browser; render the signed-out nav until
+  // hydration finishes so SSR markup and the first client render match.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  const signedIn = hydrated && !!session;
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,7 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             PrepRounds
           </Link>
           <nav className="flex items-center gap-1 text-sm">
-            {session ? (
+            {signedIn ? (
               <>
                 <Link to="/syllabus">
                   <Button variant="ghost" size="sm">
