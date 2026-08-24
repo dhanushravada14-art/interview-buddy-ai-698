@@ -117,16 +117,65 @@ const gradeSchema = z.object({
       marks: z.number(),
       verdict: z.string(),
       ideal_answer: z.string(),
+      concept: z.string(),
     }),
   ),
   feedback: z.string(),
 });
 
+const conceptSchema = z.object({
+  explanations: z.array(z.object({ concept: z.string() })),
+});
+
+export type PerQuestion = {
+  marks: number;
+  verdict: string;
+  ideal_answer: string;
+  concept: string;
+};
+
 export type GradeResult = {
   score: number;
-  per_question: { marks: number; verdict: string; ideal_answer: string }[];
+  per_question: PerQuestion[];
   feedback: string;
 };
+
+// Detailed teaching notes for the aptitude round: the concept behind each
+// question, the method step by step, and the traps students fall into.
+async function explainMcqConcepts(
+  questions: Question[],
+  answers: string[],
+): Promise<string[]> {
+  const model = getGatewayModel();
+  const list = questions
+    .map((q, i) => {
+      const opts = (q.options ?? []).map((o, j) => `${j}. ${o}`).join(" | ");
+      return `Q${i + 1} (${q.topic}): ${q.question}\nOptions: ${opts}\nCorrect option index: ${q.correct_index ?? 0}\nStudent picked index: ${answers[i] ?? "(none)"}`;
+    })
+    .join("\n\n");
+
+  try {
+    const { output } = await generateText({
+      model,
+      system:
+        "You are a patient placement-training tutor. You teach the underlying concept clearly to a first-time candidate.",
+      prompt: `For each aptitude question below, write a detailed markdown explanation (about 120-180 words) with these parts:
+**Concept** - the topic/rule being tested and why it applies here.
+**Formula / rule** - any formula or logical rule, written out.
+**Step by step** - the full worked solution leading to the correct option.
+**Why the other options are wrong** - short reasons.
+**Common mistake** - the trap students hit, and a tip to avoid it next time.
+
+Questions:
+${list}`,
+      output: Output.object({ schema: conceptSchema }),
+    });
+    const parsed = output as z.infer<typeof conceptSchema>;
+    return questions.map((_, i) => parsed.explanations[i]?.concept ?? "");
+  } catch {
+    return questions.map(() => "");
+  }
+}
 
 export async function gradeRound(
   row: { round: number; round_name: string; questions: unknown },
@@ -137,6 +186,7 @@ export async function gradeRound(
   const model = getGatewayModel();
 
   if (questions[0]?.type === "mcq") {
+    const concepts = await explainMcqConcepts(questions, answers);
     const per_question = questions.map((q, i) => {
       const picked = answers[i] ?? "";
       const correct = String(q.correct_index ?? 0);
@@ -147,6 +197,7 @@ export async function gradeRound(
           ? "Correct"
           : `Incorrect — correct option: ${q.options?.[q.correct_index ?? 0] ?? "-"}`,
         ideal_answer: q.explanation ?? "",
+        concept: concepts[i] || q.explanation || "",
       };
     });
     const correctCount = per_question.filter((p) => p.marks > 0).length;
@@ -178,7 +229,7 @@ ${profileBrief(profile)}
 Transcript:
 ${transcript}
 
-For each question return marks out of 10, a one or two sentence verdict naming what was strong or missing, and a short ideal answer. Then write overall feedback in markdown with three short sections: What went well, What to improve, and Next steps. Be encouraging but honest. An empty answer scores 0.`;
+For each question return: marks out of 10; a one or two sentence verdict naming what was strong or missing; a short ideal answer; and a detailed markdown "concept" explanation of about 130-200 words that teaches the underlying idea being tested, structured as **What this question tests**, **The concept explained**, **How to structure a strong answer** (a framework such as STAR, or the technical fundamentals involved), and **Common mistake to avoid**. Then write overall feedback in markdown with three short sections: What went well, What to improve, and Next steps. Be encouraging but honest. An empty answer scores 0.`;
 
   try {
     const { output } = await generateText({
@@ -196,6 +247,7 @@ For each question return marks out of 10, a one or two sentence verdict naming w
         marks: Math.max(0, Math.min(10, Math.round(p?.marks ?? 0))),
         verdict: p?.verdict ?? "Not evaluated.",
         ideal_answer: p?.ideal_answer ?? "",
+        concept: p?.concept ?? "",
       };
     });
     const total = per_question.reduce((s, p) => s + p.marks, 0);
