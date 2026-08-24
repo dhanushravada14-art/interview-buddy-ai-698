@@ -110,6 +110,16 @@ function ResultsPage() {
                       {p.ideal_answer}
                     </p>
                   )}
+                  {p?.concept && (
+                    <details className="border-border/70 mt-3 rounded-lg border p-3" open>
+                      <summary className="cursor-pointer text-sm font-medium">
+                        Concept explained in detail
+                      </summary>
+                      <div className="prose prose-sm prose-invert mt-3 max-w-none">
+                        <ReactMarkdown>{p.concept}</ReactMarkdown>
+                      </div>
+                    </details>
+                  )}
                 </CardContent>
               </Card>
             );
