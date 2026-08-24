@@ -66,6 +66,11 @@ function Index() {
                   Start free <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
+              <Link to="/syllabus">
+                <Button size="lg" variant="outline">
+                  View syllabus
+                </Button>
+              </Link>
               <Link to="/dashboard">
                 <Button size="lg" variant="outline">
                   Go to dashboard
