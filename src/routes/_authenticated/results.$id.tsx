@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/results/$id")({
 });
 
 type Q = { question: string; topic: string; options?: string[]; correct_index?: number };
-type P = { marks: number; verdict: string; ideal_answer: string };
+type P = { marks: number; verdict: string; ideal_answer: string; concept?: string };
 
 function ResultsPage() {
   const { id } = Route.useParams();
