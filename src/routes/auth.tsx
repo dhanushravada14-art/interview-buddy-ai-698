@@ -34,10 +34,24 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [setPwMode, setSetPwMode] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/dashboard" });
+    if (loading || !session) return;
+    const pending = sessionStorage.getItem("preprounds:pending-password");
+    if (pending) {
+      sessionStorage.removeItem("preprounds:pending-password");
+      void supabase.auth.updateUser({ password: pending }).then(({ error }) => {
+        if (error) toast.error(`Signed in, but password not set: ${error.message}`);
+        else toast.success("Password set — you can now sign in with email and password.");
+        navigate({ to: "/dashboard" });
+      });
+      return;
+    }
+    navigate({ to: "/dashboard" });
   }, [loading, session, navigate]);
+
 
   async function signIn() {
     setBusy(true);
