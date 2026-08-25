@@ -182,7 +182,52 @@ function AuthPage() {
                 <Button className="w-full" disabled={busy} onClick={signIn}>
                   Sign in
                 </Button>
+
+                <div className="rounded-lg border border-border/70 p-4">
+                  {setPwMode ? (
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="newpw">New password</Label>
+                        <Input
+                          id="newpw"
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="At least 6 characters"
+                        />
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        Continue with Google below and this password will be set on your account, so
+                        next time you can sign in with email and password.
+                      </p>
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        onClick={() => {
+                          setSetPwMode(false);
+                          setNewPassword("");
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-muted-foreground text-xs">
+                        Signed up with Google and have no password yet?
+                      </p>
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        onClick={() => setSetPwMode(true)}
+                      >
+                        Set a password
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </TabsContent>
+
 
               <TabsContent value="signup" className="mt-6 space-y-4">
                 <div className="space-y-2">
