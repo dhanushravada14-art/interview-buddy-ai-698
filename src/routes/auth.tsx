@@ -263,8 +263,9 @@ function AuthPage() {
               <span className="h-px flex-1 bg-border" />
             </div>
             <Button variant="outline" className="w-full" onClick={google}>
-              Continue with Google
+              {setPwMode ? "Continue with Google & set password" : "Continue with Google"}
             </Button>
+
             <p className="text-muted-foreground mt-6 text-center text-xs">
               <Link to="/">Back to home</Link>
             </p>
