@@ -16,7 +16,7 @@ export const ROUNDS: RoundMeta[] = [
     slug: "aptitude",
     name: "Round 1 — Aptitude Test",
     tagline:
-      "20 timed questions: 5 easy, 10 moderate, 5 tough across quantitative, logical reasoning and verbal ability.",
+      "20 timed questions across quantitative, logical reasoning and verbal ability.",
     format: "mcq",
     count: 20,
     minutes: 30,
