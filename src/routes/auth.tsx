@@ -34,6 +34,9 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  // Google flow has its own email + set-password controls, separate from the
+  // email/password sign-in form so the two never share or clobber state.
+  const [googleEmail, setGoogleEmail] = useState("");
   const [setPwMode, setSetPwMode] = useState(false);
   const [newPassword, setNewPassword] = useState("");
 
@@ -134,6 +137,11 @@ function AuthPage() {
     }
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
+      extraParams: {
+        // Pre-fill Google's account chooser with the email entered for the
+        // Google flow, so it stays distinct from the email/password sign-in.
+        ...(googleEmail.trim() ? { login_hint: googleEmail.trim().toLowerCase() } : {}),
+      },
     });
 
     if (result.error) {
