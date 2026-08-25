@@ -34,10 +34,24 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [setPwMode, setSetPwMode] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/dashboard" });
+    if (loading || !session) return;
+    const pending = sessionStorage.getItem("preprounds:pending-password");
+    if (pending) {
+      sessionStorage.removeItem("preprounds:pending-password");
+      void supabase.auth.updateUser({ password: pending }).then(({ error }) => {
+        if (error) toast.error(`Signed in, but password not set: ${error.message}`);
+        else toast.success("Password set — you can now sign in with email and password.");
+        navigate({ to: "/dashboard" });
+      });
+      return;
+    }
+    navigate({ to: "/dashboard" });
   }, [loading, session, navigate]);
+
 
   async function signIn() {
     setBusy(true);
@@ -111,9 +125,17 @@ function AuthPage() {
 
 
   async function google() {
+    if (setPwMode) {
+      if (newPassword.length < 6) {
+        toast.error("Choose a password of at least 6 characters first.");
+        return;
+      }
+      sessionStorage.setItem("preprounds:pending-password", newPassword);
+    }
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
+
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");
       return;
@@ -160,7 +182,52 @@ function AuthPage() {
                 <Button className="w-full" disabled={busy} onClick={signIn}>
                   Sign in
                 </Button>
+
+                <div className="rounded-lg border border-border/70 p-4">
+                  {setPwMode ? (
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="newpw">New password</Label>
+                        <Input
+                          id="newpw"
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="At least 6 characters"
+                        />
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        Continue with Google below and this password will be set on your account, so
+                        next time you can sign in with email and password.
+                      </p>
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        onClick={() => {
+                          setSetPwMode(false);
+                          setNewPassword("");
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-muted-foreground text-xs">
+                        Signed up with Google and have no password yet?
+                      </p>
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        onClick={() => setSetPwMode(true)}
+                      >
+                        Set a password
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </TabsContent>
+
 
               <TabsContent value="signup" className="mt-6 space-y-4">
                 <div className="space-y-2">
@@ -196,8 +263,9 @@ function AuthPage() {
               <span className="h-px flex-1 bg-border" />
             </div>
             <Button variant="outline" className="w-full" onClick={google}>
-              Continue with Google
+              {setPwMode ? "Continue with Google & set password" : "Continue with Google"}
             </Button>
+
             <p className="text-muted-foreground mt-6 text-center text-xs">
               <Link to="/">Back to home</Link>
             </p>
