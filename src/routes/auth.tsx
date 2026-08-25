@@ -125,9 +125,17 @@ function AuthPage() {
 
 
   async function google() {
+    if (setPwMode) {
+      if (newPassword.length < 6) {
+        toast.error("Choose a password of at least 6 characters first.");
+        return;
+      }
+      sessionStorage.setItem("preprounds:pending-password", newPassword);
+    }
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
+
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");
       return;
