@@ -159,22 +159,52 @@ function InterviewPage() {
 
         {phase === "running" && current && (
           <>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-primary text-sm font-semibold">{meta.name}</div>
-                <h1 className="text-muted-foreground text-sm">
-                  Question {index + 1} of {questions.length} · {current.topic}
-                </h1>
+            <div className="bg-background/85 sticky top-0 z-20 -mx-4 px-4 py-3 backdrop-blur">
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="text-primary text-sm font-semibold">{meta.name}</div>
+                  <h1 className="text-muted-foreground truncate text-sm">
+                    Question {index + 1} of {questions.length} · {current.topic}
+                  </h1>
+                </div>
+                <div
+                  className={`rounded-lg border px-3 py-1.5 font-mono text-lg tabular-nums ${
+                    secondsLeft <= 120
+                      ? "border-destructive/50 text-destructive animate-pulse"
+                      : "border-border/70"
+                  }`}
+                  aria-label="Time remaining"
+                >
+                  {mm}:{ss}
+                </div>
               </div>
-              <div className="font-mono text-lg">
-                {mm}:{ss}
-              </div>
+              <Progress className="mt-3" value={((index + 1) / questions.length) * 100} />
             </div>
-            <Progress className="mt-4" value={((index + 1) / questions.length) * 100} />
+
+            <div className="text-muted-foreground mt-4 flex flex-wrap gap-1.5 text-xs">
+              {questions.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  className={`h-7 w-7 rounded-md border transition-colors ${
+                    i === index
+                      ? "border-primary text-primary font-semibold"
+                      : answers[i]
+                        ? "border-primary/40 bg-primary/10 text-foreground"
+                        : "border-border/70 hover:border-primary/50"
+                  }`}
+                  aria-label={`Go to question ${i + 1}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
 
             <Card className="glow-panel mt-6 border-border/70">
               <CardContent className="p-6">
                 <p className="text-lg font-medium">{current.question}</p>
+
 
                 {current.type === "mcq" ? (
                   <RadioGroup

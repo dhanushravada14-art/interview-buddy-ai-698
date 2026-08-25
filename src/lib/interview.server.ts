@@ -36,10 +36,16 @@ function profileBrief(profile: ProfileRow) {
 }
 
 const roundBrief: Record<number, string> = {
-  1: "Round 1 is a written APTITUDE test. Mix quantitative aptitude, logical reasoning, data interpretation and verbal ability at campus-placement difficulty. Lightly bias a couple of questions toward the student's target role domain.",
-  2: "Round 2 is a MANAGERIAL interview. Ask situational and behavioural questions about ownership, prioritisation, conflict, deadlines, teamwork and decision making, grounded in the student's actual projects.",
-  3: "Round 3 is a TECHNICAL interview. Every question must come from the student's listed skills and projects: design decisions, trade-offs, debugging, core fundamentals of those exact technologies, and depth probes on what they built.",
-  4: "Round 4 is an HR interview. Ask about motivation, strengths, weaknesses, relocation, career goals, culture fit and salary expectations, personalised to their background.",
+  1: `Round 1 is a written APTITUDE test of exactly 20 questions, using the real question patterns companies actually ask in campus placement aptitude papers (TCS, Infosys, Wipro, Capgemini, Accenture style).
+Difficulty mix is mandatory:
+- Questions 1-5: EASY (direct one-step formula or vocabulary/grammar).
+- Questions 6-15: MODERATE (two-step reasoning, standard placement favourites).
+- Questions 16-20: TOUGH (multi-step, tricky data interpretation, advanced puzzles).
+Prefix each topic with the difficulty, e.g. "Easy · Percentages", "Moderate · Time & Work", "Tough · Puzzles".
+Cover quantitative aptitude, logical reasoning, data interpretation and verbal ability, and lightly bias a couple of questions toward the student's target role domain.`,
+  2: "Round 2 is a MANAGERIAL interview. Mostly ask the questions managers genuinely ask in placement interviews (handling conflict with a teammate, missing a deadline, prioritising two urgent tasks, leading without authority, taking ownership of a mistake), and ground them in the student's actual projects.",
+  3: "Round 3 is a TECHNICAL interview. Blend the standard technical interview staples for freshers (core fundamentals of their languages, OOP, DBMS/SQL, OS, networks, complexity) with deep probes on their listed skills and projects: design decisions, trade-offs and debugging of what they actually built.",
+  4: "Round 4 is an HR interview. Ask the classic HR questions asked in nearly every interview (tell me about yourself, why this company/role, strengths and weaknesses, where do you see yourself in 5 years, relocation and shifts, salary expectations, why should we hire you), personalised to their background.",
 };
 
 const mcqSchema = z.object({
