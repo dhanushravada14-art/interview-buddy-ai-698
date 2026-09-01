@@ -266,3 +266,52 @@ For each question return: marks out of 10; a one or two sentence verdict naming 
     throw error;
   }
 }
+
+const followupSchema = z.object({
+  followup: z.string(),
+  probe: z.string(),
+});
+
+// A real interviewer digs deeper into whatever the candidate just said.
+export async function followUpQuestion(
+  roundName: string,
+  question: string,
+  answer: string,
+  previous: string[],
+  profile: ProfileRow,
+): Promise<{ followup: string; probe: string }> {
+  const model = getGatewayModel();
+  const asked = previous.length
+    ? `Follow-ups already asked (do not repeat them):\n${previous.map((p) => `- ${p}`).join("\n")}`
+    : "No follow-ups asked yet.";
+
+  try {
+    const { output } = await generateText({
+      model,
+      system:
+        "You are a campus placement interviewer conducting a live interview. You listen to the candidate's answer and probe deeper, exactly like a real interviewer would.",
+      prompt: `Round: ${roundName}
+
+Candidate profile:
+${profileBrief(profile)}
+
+Original question: ${question}
+Candidate's answer: ${answer.trim() || "(no answer given)"}
+
+${asked}
+
+Ask ONE natural follow-up question that digs into the weakest, vaguest or most interesting part of this specific answer. If the answer was empty or off-topic, ask a simpler guiding version of the original question. Also give "probe": a one-line hint (max 20 words) telling the candidate what the interviewer is really looking for.`,
+      output: Output.object({ schema: followupSchema }),
+    });
+    const parsed = output as z.infer<typeof followupSchema>;
+    return {
+      followup: parsed.followup.trim() || "Can you walk me through that with a concrete example?",
+      probe: parsed.probe.trim(),
+    };
+  } catch {
+    return {
+      followup: "Can you walk me through that with a concrete example and the reasoning behind it?",
+      probe: "The interviewer wants specifics: your actions, the trade-offs and the outcome.",
+    };
+  }
+}
