@@ -63,14 +63,31 @@ function InterviewPage() {
 
   const indexRef = useRef(index);
   indexRef.current = index;
+  // Which box the mic is currently filling: the main answer, or a follow-up reply.
+  const targetRef = useRef<number | "main">("main");
   const appendSpeech = useCallback((text: string) => {
     if (!text) return;
-    setAnswers((prev) => {
-      const next = [...prev];
-      const i = indexRef.current;
-      const existing = next[i] ?? "";
-      next[i] = existing ? `${existing.replace(/\s+$/, "")} ${text}` : text;
-      return next;
+    const i = indexRef.current;
+    const target = targetRef.current;
+    if (target === "main") {
+      setAnswers((prev) => {
+        const next = [...prev];
+        const existing = next[i] ?? "";
+        next[i] = existing ? `${existing.replace(/\s+$/, "")} ${text}` : text;
+        return next;
+      });
+      return;
+    }
+    setFollowups((prev) => {
+      const list = [...(prev[i] ?? [])];
+      const item = list[target];
+      if (!item) return prev;
+      const existing = item.answer;
+      list[target] = {
+        ...item,
+        answer: existing ? `${existing.replace(/\s+$/, "")} ${text}` : text,
+      };
+      return { ...prev, [i]: list };
     });
   }, []);
   const dictation = useDictation(appendSpeech);
@@ -95,6 +112,7 @@ function InterviewPage() {
       setSessionId(row.id);
       setQuestions(qs);
       setAnswers(qs.map(() => ""));
+      setFollowups({});
       setIndex(0);
       setSecondsLeft((meta?.minutes ?? 15) * 60);
       setPhase("running");
@@ -104,18 +122,59 @@ function InterviewPage() {
     }
   }
 
+  async function getFollowup() {
+    const q = questions[index];
+    if (!sessionId || !q) return;
+    setFollowupLoading(true);
+    stopDictation();
+    try {
+      const previous = (followups[index] ?? []).map((f) => f.question);
+      const res = await withRetry(() =>
+        probe({
+          data: {
+            id: sessionId,
+            question: q.question,
+            answer: answers[index] ?? "",
+            previous,
+          },
+        }),
+      );
+      setFollowups((prev) => ({
+        ...prev,
+        [index]: [...(prev[index] ?? []), { ...res, answer: "" }],
+      }));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not get a follow-up question.");
+    } finally {
+      setFollowupLoading(false);
+    }
+  }
+
+  // Grading should see the whole exchange, not just the first answer.
+  function mergedAnswers() {
+    return answers.map((a, i) => {
+      const list = followups[i] ?? [];
+      if (!list.length) return a;
+      const tail = list
+        .map((f) => `\n\nInterviewer follow-up: ${f.question}\nMy answer: ${f.answer.trim()}`)
+        .join("");
+      return `${a}${tail}`;
+    });
+  }
+
   async function submit() {
     if (!sessionId) return;
     stopDictation();
     setPhase("grading");
     try {
-      await withRetry(() => finish({ data: { id: sessionId, answers } }));
+      await withRetry(() => finish({ data: { id: sessionId, answers: mergedAnswers() } }));
       navigate({ to: "/results/$id", params: { id: sessionId } });
     } catch (e) {
       setPhase("running");
       toast.error(e instanceof Error ? e.message : "Grading failed. Try again.");
     }
   }
+
 
   if (!meta) {
     return (
