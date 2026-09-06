@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useDictation } from "@/hooks/useDictation";
 import { withRetry } from "@/lib/retry";
-import { startRound, submitRound } from "@/lib/interview.functions";
+import { askFollowup, startRound, submitRound } from "@/lib/interview.functions";
 import { roundBySlug } from "@/lib/rounds";
 
 export const Route = createFileRoute("/_authenticated/interview/$slug")({
