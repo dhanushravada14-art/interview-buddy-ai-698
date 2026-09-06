@@ -304,7 +304,7 @@ function InterviewPage() {
                       rows={9}
                       placeholder="Answer as you would out loud in the interview…"
                       value={
-                        dictation.interim
+                        dictation.interim && targetRef.current === "main"
                           ? `${answers[index] ?? ""}${answers[index] ? " " : ""}${dictation.interim}`
                           : (answers[index] ?? "")
                       }
@@ -317,17 +317,39 @@ function InterviewPage() {
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <Button
                         type="button"
-                        variant={dictation.listening ? "default" : "outline"}
+                        variant={
+                          dictation.listening && targetRef.current === "main" ? "default" : "outline"
+                        }
                         size="sm"
                         disabled={!dictation.supported}
-                        onClick={dictation.toggle}
+                        onClick={() => {
+                          if (dictation.listening && targetRef.current !== "main") stopDictation();
+                          targetRef.current = "main";
+                          dictation.toggle();
+                        }}
                       >
-                        {dictation.listening ? (
+                        {dictation.listening && targetRef.current === "main" ? (
                           <MicOff className="mr-2 h-4 w-4" />
                         ) : (
                           <Mic className="mr-2 h-4 w-4" />
                         )}
-                        {dictation.listening ? "Stop recording" : "Answer by voice"}
+                        {dictation.listening && targetRef.current === "main"
+                          ? "Stop recording"
+                          : "Answer by voice"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={followupLoading || !(answers[index] ?? "").trim()}
+                        onClick={getFollowup}
+                      >
+                        {followupLoading ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <MessageCircleQuestion className="mr-2 h-4 w-4" />
+                        )}
+                        Get follow-up question
                       </Button>
                       <span className="text-muted-foreground text-xs">
                         {!dictation.supported
@@ -337,7 +359,66 @@ function InterviewPage() {
                             : "Speak your answer and we'll transcribe it into the box."}
                       </span>
                     </div>
+
+                    {(followups[index] ?? []).map((f, fi) => (
+                      <div
+                        key={fi}
+                        className="border-primary/40 bg-primary/5 mt-5 rounded-lg border p-4"
+                      >
+                        <div className="text-primary text-xs font-semibold uppercase">
+                          Interviewer follow-up {fi + 1}
+                        </div>
+                        <p className="mt-1 font-medium">{f.question}</p>
+                        {f.probe && (
+                          <p className="text-muted-foreground mt-1 text-xs italic">{f.probe}</p>
+                        )}
+                        <Textarea
+                          className="mt-3"
+                          rows={5}
+                          placeholder="Answer the follow-up…"
+                          value={
+                            dictation.interim && targetRef.current === fi
+                              ? `${f.answer}${f.answer ? " " : ""}${dictation.interim}`
+                              : f.answer
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setFollowups((prev) => {
+                              const list = [...(prev[index] ?? [])];
+                              const item = list[fi];
+                              if (!item) return prev;
+                              list[fi] = { ...item, answer: value };
+                              return { ...prev, [index]: list };
+                            });
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          className="mt-2"
+                          variant={
+                            dictation.listening && targetRef.current === fi ? "default" : "outline"
+                          }
+                          size="sm"
+                          disabled={!dictation.supported}
+                          onClick={() => {
+                            if (dictation.listening && targetRef.current !== fi) stopDictation();
+                            targetRef.current = fi;
+                            dictation.toggle();
+                          }}
+                        >
+                          {dictation.listening && targetRef.current === fi ? (
+                            <MicOff className="mr-2 h-4 w-4" />
+                          ) : (
+                            <Mic className="mr-2 h-4 w-4" />
+                          )}
+                          {dictation.listening && targetRef.current === fi
+                            ? "Stop recording"
+                            : "Answer by voice"}
+                        </Button>
+                      </div>
+                    ))}
                   </div>
+
                 )}
               </CardContent>
             </Card>
