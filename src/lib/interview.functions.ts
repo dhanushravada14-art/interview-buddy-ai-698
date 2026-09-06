@@ -96,7 +96,40 @@ export const startRound = createServerFn({ method: "POST" })
     return row;
   });
 
+export const askFollowup = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        question: z.string().max(4000),
+        answer: z.string().max(6000),
+        previous: z.array(z.string().max(4000)).max(10).default([]),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { followUpQuestion } = await import("./interview.server");
+    const { data: row, error } = await context.supabase
+      .from("interview_sessions")
+      .select("id, round_name")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("Interview not found");
+
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    return followUpQuestion(row.round_name, data.question, data.answer, data.previous, profile);
+  });
+
 export const submitRound = createServerFn({ method: "POST" })
+
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z.object({ id: z.string().uuid(), answers: z.array(z.string().max(6000)) }).parse(input),

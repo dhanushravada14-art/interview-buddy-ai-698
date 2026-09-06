@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Mic, MicOff } from "lucide-react";
+import { Loader2, MessageCircleQuestion, Mic, MicOff } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useDictation } from "@/hooks/useDictation";
 import { withRetry } from "@/lib/retry";
-import { startRound, submitRound } from "@/lib/interview.functions";
+import { askFollowup, startRound, submitRound } from "@/lib/interview.functions";
 import { roundBySlug } from "@/lib/rounds";
 
 export const Route = createFileRoute("/_authenticated/interview/$slug")({
@@ -47,23 +47,47 @@ function InterviewPage() {
   const begin = useServerFn(startRound);
   const finish = useServerFn(submitRound);
 
+  const probe = useServerFn(askFollowup);
+
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
+  const [followups, setFollowups] = useState<
+    Record<number, { question: string; probe: string; answer: string }[]>
+  >({});
+  const [followupLoading, setFollowupLoading] = useState(false);
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"idle" | "loading" | "running" | "grading">("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
 
+
   const indexRef = useRef(index);
   indexRef.current = index;
+  // Which box the mic is currently filling: the main answer, or a follow-up reply.
+  const targetRef = useRef<number | "main">("main");
   const appendSpeech = useCallback((text: string) => {
     if (!text) return;
-    setAnswers((prev) => {
-      const next = [...prev];
-      const i = indexRef.current;
-      const existing = next[i] ?? "";
-      next[i] = existing ? `${existing.replace(/\s+$/, "")} ${text}` : text;
-      return next;
+    const i = indexRef.current;
+    const target = targetRef.current;
+    if (target === "main") {
+      setAnswers((prev) => {
+        const next = [...prev];
+        const existing = next[i] ?? "";
+        next[i] = existing ? `${existing.replace(/\s+$/, "")} ${text}` : text;
+        return next;
+      });
+      return;
+    }
+    setFollowups((prev) => {
+      const list = [...(prev[i] ?? [])];
+      const item = list[target];
+      if (!item) return prev;
+      const existing = item.answer;
+      list[target] = {
+        ...item,
+        answer: existing ? `${existing.replace(/\s+$/, "")} ${text}` : text,
+      };
+      return { ...prev, [i]: list };
     });
   }, []);
   const dictation = useDictation(appendSpeech);
@@ -88,6 +112,7 @@ function InterviewPage() {
       setSessionId(row.id);
       setQuestions(qs);
       setAnswers(qs.map(() => ""));
+      setFollowups({});
       setIndex(0);
       setSecondsLeft((meta?.minutes ?? 15) * 60);
       setPhase("running");
@@ -97,18 +122,63 @@ function InterviewPage() {
     }
   }
 
+  async function getFollowup() {
+    const q = questions[index];
+    if (!sessionId || !q) return;
+    setFollowupLoading(true);
+    stopDictation();
+    try {
+      const previous = (followups[index] ?? []).map((f) => f.question);
+      const res = await withRetry(() =>
+        probe({
+          data: {
+            id: sessionId,
+            question: q.question,
+            answer: answers[index] ?? "",
+            previous,
+          },
+        }),
+      );
+      setFollowups((prev) => ({
+        ...prev,
+        [index]: [
+          ...(prev[index] ?? []),
+          { question: res.followup, probe: res.probe, answer: "" },
+        ],
+      }));
+
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not get a follow-up question.");
+    } finally {
+      setFollowupLoading(false);
+    }
+  }
+
+  // Grading should see the whole exchange, not just the first answer.
+  function mergedAnswers() {
+    return answers.map((a, i) => {
+      const list = followups[i] ?? [];
+      if (!list.length) return a;
+      const tail = list
+        .map((f) => `\n\nInterviewer follow-up: ${f.question}\nMy answer: ${f.answer.trim()}`)
+        .join("");
+      return `${a}${tail}`;
+    });
+  }
+
   async function submit() {
     if (!sessionId) return;
     stopDictation();
     setPhase("grading");
     try {
-      await withRetry(() => finish({ data: { id: sessionId, answers } }));
+      await withRetry(() => finish({ data: { id: sessionId, answers: mergedAnswers() } }));
       navigate({ to: "/results/$id", params: { id: sessionId } });
     } catch (e) {
       setPhase("running");
       toast.error(e instanceof Error ? e.message : "Grading failed. Try again.");
     }
   }
+
 
   if (!meta) {
     return (
@@ -234,7 +304,7 @@ function InterviewPage() {
                       rows={9}
                       placeholder="Answer as you would out loud in the interview…"
                       value={
-                        dictation.interim
+                        dictation.interim && targetRef.current === "main"
                           ? `${answers[index] ?? ""}${answers[index] ? " " : ""}${dictation.interim}`
                           : (answers[index] ?? "")
                       }
@@ -247,17 +317,39 @@ function InterviewPage() {
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       <Button
                         type="button"
-                        variant={dictation.listening ? "default" : "outline"}
+                        variant={
+                          dictation.listening && targetRef.current === "main" ? "default" : "outline"
+                        }
                         size="sm"
                         disabled={!dictation.supported}
-                        onClick={dictation.toggle}
+                        onClick={() => {
+                          if (dictation.listening && targetRef.current !== "main") stopDictation();
+                          targetRef.current = "main";
+                          dictation.toggle();
+                        }}
                       >
-                        {dictation.listening ? (
+                        {dictation.listening && targetRef.current === "main" ? (
                           <MicOff className="mr-2 h-4 w-4" />
                         ) : (
                           <Mic className="mr-2 h-4 w-4" />
                         )}
-                        {dictation.listening ? "Stop recording" : "Answer by voice"}
+                        {dictation.listening && targetRef.current === "main"
+                          ? "Stop recording"
+                          : "Answer by voice"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={followupLoading || !(answers[index] ?? "").trim()}
+                        onClick={getFollowup}
+                      >
+                        {followupLoading ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <MessageCircleQuestion className="mr-2 h-4 w-4" />
+                        )}
+                        Get follow-up question
                       </Button>
                       <span className="text-muted-foreground text-xs">
                         {!dictation.supported
@@ -267,7 +359,66 @@ function InterviewPage() {
                             : "Speak your answer and we'll transcribe it into the box."}
                       </span>
                     </div>
+
+                    {(followups[index] ?? []).map((f, fi) => (
+                      <div
+                        key={fi}
+                        className="border-primary/40 bg-primary/5 mt-5 rounded-lg border p-4"
+                      >
+                        <div className="text-primary text-xs font-semibold uppercase">
+                          Interviewer follow-up {fi + 1}
+                        </div>
+                        <p className="mt-1 font-medium">{f.question}</p>
+                        {f.probe && (
+                          <p className="text-muted-foreground mt-1 text-xs italic">{f.probe}</p>
+                        )}
+                        <Textarea
+                          className="mt-3"
+                          rows={5}
+                          placeholder="Answer the follow-up…"
+                          value={
+                            dictation.interim && targetRef.current === fi
+                              ? `${f.answer}${f.answer ? " " : ""}${dictation.interim}`
+                              : f.answer
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setFollowups((prev) => {
+                              const list = [...(prev[index] ?? [])];
+                              const item = list[fi];
+                              if (!item) return prev;
+                              list[fi] = { ...item, answer: value };
+                              return { ...prev, [index]: list };
+                            });
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          className="mt-2"
+                          variant={
+                            dictation.listening && targetRef.current === fi ? "default" : "outline"
+                          }
+                          size="sm"
+                          disabled={!dictation.supported}
+                          onClick={() => {
+                            if (dictation.listening && targetRef.current !== fi) stopDictation();
+                            targetRef.current = fi;
+                            dictation.toggle();
+                          }}
+                        >
+                          {dictation.listening && targetRef.current === fi ? (
+                            <MicOff className="mr-2 h-4 w-4" />
+                          ) : (
+                            <Mic className="mr-2 h-4 w-4" />
+                          )}
+                          {dictation.listening && targetRef.current === fi
+                            ? "Stop recording"
+                            : "Answer by voice"}
+                        </Button>
+                      </div>
+                    ))}
                   </div>
+
                 )}
               </CardContent>
             </Card>
