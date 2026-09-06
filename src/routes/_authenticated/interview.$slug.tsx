@@ -47,12 +47,19 @@ function InterviewPage() {
   const begin = useServerFn(startRound);
   const finish = useServerFn(submitRound);
 
+  const probe = useServerFn(askFollowup);
+
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
+  const [followups, setFollowups] = useState<
+    Record<number, { question: string; probe: string; answer: string }[]>
+  >({});
+  const [followupLoading, setFollowupLoading] = useState(false);
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"idle" | "loading" | "running" | "grading">("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
+
 
   const indexRef = useRef(index);
   indexRef.current = index;
