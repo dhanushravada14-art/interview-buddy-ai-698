@@ -141,8 +141,12 @@ function InterviewPage() {
       );
       setFollowups((prev) => ({
         ...prev,
-        [index]: [...(prev[index] ?? []), { ...res, answer: "" }],
+        [index]: [
+          ...(prev[index] ?? []),
+          { question: res.followup, probe: res.probe, answer: "" },
+        ],
       }));
+
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not get a follow-up question.");
     } finally {
