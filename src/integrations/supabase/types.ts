@@ -14,6 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          created_at: string
+          details: Json
+          id: string
+          kind: string
+          ref_id: string | null
+          score: number
+          subtopic: string
+          title: string
+          topic: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          id?: string
+          kind: string
+          ref_id?: string | null
+          score?: number
+          subtopic?: string
+          title?: string
+          topic?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          id?: string
+          kind?: string
+          ref_id?: string | null
+          score?: number
+          subtopic?: string
+          title?: string
+          topic?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      coding_submissions: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          language: string
+          passed: number
+          problem_slug: string
+          review: Json | null
+          status: string
+          topic: string
+          total: number
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          language: string
+          passed?: number
+          problem_slug: string
+          review?: Json | null
+          status?: string
+          topic?: string
+          total?: number
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          language?: string
+          passed?: number
+          problem_slug?: string
+          review?: Json | null
+          status?: string
+          topic?: string
+          total?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      companies: {
+        Row: {
+          active: boolean
+          aptitude_topics: Json
+          category: string
+          coding_topics: Json
+          created_at: string
+          description: string
+          difficulty: string
+          hr_focus: Json
+          id: string
+          name: string
+          rounds: Json
+          slug: string
+          technical_topics: Json
+          tips: Json
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          aptitude_topics?: Json
+          category?: string
+          coding_topics?: Json
+          created_at?: string
+          description?: string
+          difficulty?: string
+          hr_focus?: Json
+          id?: string
+          name: string
+          rounds?: Json
+          slug: string
+          technical_topics?: Json
+          tips?: Json
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          aptitude_topics?: Json
+          category?: string
+          coding_topics?: Json
+          created_at?: string
+          description?: string
+          difficulty?: string
+          hr_focus?: Json
+          id?: string
+          name?: string
+          rounds?: Json
+          slug?: string
+          technical_topics?: Json
+          tips?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       doubt_messages: {
         Row: {
           created_at: string
@@ -79,8 +214,10 @@ export type Database = {
           completed: boolean
           completed_at: string | null
           created_at: string
+          dimensions: Json | null
           feedback: string | null
           id: string
+          mock_id: string | null
           per_question: Json
           questions: Json
           round: number
@@ -93,8 +230,10 @@ export type Database = {
           completed?: boolean
           completed_at?: string | null
           created_at?: string
+          dimensions?: Json | null
           feedback?: string | null
           id?: string
+          mock_id?: string | null
           per_question?: Json
           questions?: Json
           round: number
@@ -107,8 +246,10 @@ export type Database = {
           completed?: boolean
           completed_at?: string | null
           created_at?: string
+          dimensions?: Json | null
           feedback?: string | null
           id?: string
+          mock_id?: string | null
           per_question?: Json
           questions?: Json
           round?: number
@@ -120,40 +261,148 @@ export type Database = {
       }
       profiles: {
         Row: {
+          achievements: string
+          branch: string
+          certifications: string
+          cgpa: string
           college: string
           created_at: string
           degree: string
           full_name: string
           graduation_year: string
           id: string
+          internships: string
           projects: string
+          resume_filename: string
+          resume_parsed: Json | null
+          resume_text: string
+          skill_levels: Json
           skills: string[]
+          target_companies: string[]
           target_role: string
           updated_at: string
         }
         Insert: {
+          achievements?: string
+          branch?: string
+          certifications?: string
+          cgpa?: string
           college?: string
           created_at?: string
           degree?: string
           full_name?: string
           graduation_year?: string
           id: string
+          internships?: string
           projects?: string
+          resume_filename?: string
+          resume_parsed?: Json | null
+          resume_text?: string
+          skill_levels?: Json
           skills?: string[]
+          target_companies?: string[]
           target_role?: string
           updated_at?: string
         }
         Update: {
+          achievements?: string
+          branch?: string
+          certifications?: string
+          cgpa?: string
           college?: string
           created_at?: string
           degree?: string
           full_name?: string
           graduation_year?: string
           id?: string
+          internships?: string
           projects?: string
+          resume_filename?: string
+          resume_parsed?: Json | null
+          resume_text?: string
+          skill_levels?: Json
           skills?: string[]
+          target_companies?: string[]
           target_role?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      project_interviews: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          feedback: Json | null
+          id: string
+          project_name: string
+          score: number | null
+          transcript: Json
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          project_name?: string
+          score?: number | null
+          transcript?: Json
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          project_name?: string
+          score?: number | null
+          transcript?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      roadmaps: {
+        Row: {
+          created_at: string
+          days: number
+          id: string
+          plan: Json
+          readiness: number
+          recommended: Json
+          strengths: Json
+          summary: string
+          updated_at: string
+          user_id: string
+          weaknesses: Json
+        }
+        Insert: {
+          created_at?: string
+          days?: number
+          id?: string
+          plan?: Json
+          readiness?: number
+          recommended?: Json
+          strengths?: Json
+          summary?: string
+          updated_at?: string
+          user_id: string
+          weaknesses?: Json
+        }
+        Update: {
+          created_at?: string
+          days?: number
+          id?: string
+          plan?: Json
+          readiness?: number
+          recommended?: Json
+          strengths?: Json
+          summary?: string
+          updated_at?: string
+          user_id?: string
+          weaknesses?: Json
         }
         Relationships: []
       }
