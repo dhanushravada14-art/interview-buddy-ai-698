@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SyllabusRouteImport } from './routes/syllabus'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedInterviewSlugRouteImport } from './routes/_authenticated/interview.$slug'
 import { Route as AuthenticatedResultsIdRouteImport } from './routes/_authenticated/results.$id'
@@ -42,6 +43,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDsaRoute = AuthenticatedDsaRouteImport.update({
+  id: '/dsa',
+  path: '/dsa',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dsa': typeof AuthenticatedDsaRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
   '/results/$id': typeof AuthenticatedResultsIdRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dsa': typeof AuthenticatedDsaRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
   '/results/$id': typeof AuthenticatedResultsIdRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/dsa': typeof AuthenticatedDsaRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/interview/$slug': typeof AuthenticatedInterviewSlugRoute
   '/_authenticated/results/$id': typeof AuthenticatedResultsIdRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/syllabus'
     | '/dashboard'
+    | '/dsa'
     | '/profile'
     | '/interview/$slug'
     | '/results/$id'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/syllabus'
     | '/dashboard'
+    | '/dsa'
     | '/profile'
     | '/interview/$slug'
     | '/results/$id'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/syllabus'
     | '/_authenticated/dashboard'
+    | '/_authenticated/dsa'
     | '/_authenticated/profile'
     | '/_authenticated/interview/$slug'
     | '/_authenticated/results/$id'
@@ -163,6 +175,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dsa': {
+      id: '/_authenticated/dsa'
+      path: '/dsa'
+      fullPath: '/dsa'
+      preLoaderRoute: typeof AuthenticatedDsaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -189,6 +208,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDsaRoute: typeof AuthenticatedDsaRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedInterviewSlugRoute: typeof AuthenticatedInterviewSlugRoute
   AuthenticatedResultsIdRoute: typeof AuthenticatedResultsIdRoute
@@ -196,6 +216,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDsaRoute: AuthenticatedDsaRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedInterviewSlugRoute: AuthenticatedInterviewSlugRoute,
   AuthenticatedResultsIdRoute: AuthenticatedResultsIdRoute,
