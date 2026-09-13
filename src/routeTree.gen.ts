@@ -18,6 +18,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedResumeRouteImport } from './routes/_authenticated/resume'
+import { Route as AuthenticatedSqlRouteImport } from './routes/_authenticated/sql'
 import { Route as AuthenticatedCoreCsSubjectRouteImport } from './routes/_authenticated/core-cs.$subject'
 import { Route as AuthenticatedDsaSlugRouteImport } from './routes/_authenticated/dsa.$slug'
 import { Route as AuthenticatedInterviewSlugRouteImport } from './routes/_authenticated/interview.$slug'
@@ -67,6 +68,11 @@ const AuthenticatedResumeRoute = AuthenticatedResumeRouteImport.update({
   path: '/resume',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSqlRoute = AuthenticatedSqlRouteImport.update({
+  id: '/sql',
+  path: '/sql',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCoreCsSubjectRoute =
   AuthenticatedCoreCsSubjectRouteImport.update({
     id: '/$subject',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
+  '/sql': typeof AuthenticatedSqlRoute
   '/core-cs/$subject': typeof AuthenticatedCoreCsSubjectRoute
   '/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
+  '/sql': typeof AuthenticatedSqlRoute
   '/core-cs/$subject': typeof AuthenticatedCoreCsSubjectRoute
   '/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/_authenticated/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/resume': typeof AuthenticatedResumeRoute
+  '/_authenticated/sql': typeof AuthenticatedSqlRoute
   '/_authenticated/core-cs/$subject': typeof AuthenticatedCoreCsSubjectRoute
   '/_authenticated/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/_authenticated/interview/$slug': typeof AuthenticatedInterviewSlugRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/dsa'
     | '/profile'
     | '/resume'
+    | '/sql'
     | '/core-cs/$subject'
     | '/dsa/$slug'
     | '/interview/$slug'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/dsa'
     | '/profile'
     | '/resume'
+    | '/sql'
     | '/core-cs/$subject'
     | '/dsa/$slug'
     | '/interview/$slug'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dsa'
     | '/_authenticated/profile'
     | '/_authenticated/resume'
+    | '/_authenticated/sql'
     | '/_authenticated/core-cs/$subject'
     | '/_authenticated/dsa/$slug'
     | '/_authenticated/interview/$slug'
@@ -252,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedResumeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sql': {
+      id: '/_authenticated/sql'
+      path: '/sql'
+      fullPath: '/sql'
+      preLoaderRoute: typeof AuthenticatedSqlRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/core-cs/$subject': {
       id: '/_authenticated/core-cs/$subject'
       path: '/$subject'
@@ -311,6 +330,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDsaRoute: typeof AuthenticatedDsaRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedResumeRoute: typeof AuthenticatedResumeRoute
+  AuthenticatedSqlRoute: typeof AuthenticatedSqlRoute
   AuthenticatedInterviewSlugRoute: typeof AuthenticatedInterviewSlugRoute
   AuthenticatedResultsIdRoute: typeof AuthenticatedResultsIdRoute
 }
@@ -321,6 +341,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDsaRoute: AuthenticatedDsaRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedResumeRoute: AuthenticatedResumeRoute,
+  AuthenticatedSqlRoute: AuthenticatedSqlRoute,
   AuthenticatedInterviewSlugRoute: AuthenticatedInterviewSlugRoute,
   AuthenticatedResultsIdRoute: AuthenticatedResultsIdRoute,
 }
