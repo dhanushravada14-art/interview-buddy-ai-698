@@ -40,7 +40,7 @@ export const saveProfile = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("profiles")
-      .upsert({ id: context.userId, ...data });
+      .upsert({ id: context.userId, ...data, skill_levels: data.skill_levels as never });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
