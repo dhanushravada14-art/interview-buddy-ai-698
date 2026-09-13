@@ -13,7 +13,7 @@ export type Question = {
   explanation?: string;
 };
 
-type ProfileRow = {
+export type ProfileRow = {
   full_name?: string | null;
   college?: string | null;
   degree?: string | null;
@@ -23,7 +23,7 @@ type ProfileRow = {
   projects?: string | null;
 } | null;
 
-function profileBrief(profile: ProfileRow) {
+export function profileBrief(profile: ProfileRow) {
   if (!profile) return "No profile details provided. Assume a generic final-year student.";
   return [
     `Name: ${profile.full_name || "Student"}`,
