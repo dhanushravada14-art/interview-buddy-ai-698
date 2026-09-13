@@ -10,6 +10,13 @@ const ProfileInput = z.object({
   target_role: z.string().max(120).default(""),
   skills: z.array(z.string().max(60)).max(40).default([]),
   projects: z.string().max(4000).default(""),
+  branch: z.string().max(120).default(""),
+  cgpa: z.string().max(10).default(""),
+  target_companies: z.array(z.string().max(80)).max(20).default([]),
+  skill_levels: z.record(z.number().int().min(0).max(5)).default({}),
+  internships: z.string().max(4000).default(""),
+  certifications: z.string().max(2000).default(""),
+  achievements: z.string().max(2000).default(""),
 });
 
 export const getProfile = createServerFn({ method: "GET" })
