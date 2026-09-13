@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SyllabusRouteImport } from './routes/syllabus'
+import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedCoreCsRouteImport } from './routes/_authenticated/core-cs'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
@@ -42,6 +43,11 @@ const SyllabusRoute = SyllabusRouteImport.update({
   id: '/syllabus',
   path: '/syllabus',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCoreCsRoute = AuthenticatedCoreCsRouteImport.update({
   id: '/core-cs',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
   '/core-cs': typeof AuthenticatedCoreCsRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dsa': typeof AuthenticatedDsaRouteWithChildren
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
   '/core-cs': typeof AuthenticatedCoreCsRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dsa': typeof AuthenticatedDsaRouteWithChildren
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
   '/_authenticated/core-cs': typeof AuthenticatedCoreCsRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/dsa': typeof AuthenticatedDsaRouteWithChildren
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/syllabus'
+    | '/companies'
     | '/core-cs'
     | '/dashboard'
     | '/dsa'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/syllabus'
+    | '/companies'
     | '/core-cs'
     | '/dashboard'
     | '/dsa'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/syllabus'
+    | '/_authenticated/companies'
     | '/_authenticated/core-cs'
     | '/_authenticated/dashboard'
     | '/_authenticated/dsa'
@@ -228,6 +240,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/syllabus'
       preLoaderRoute: typeof SyllabusRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/companies': {
+      id: '/_authenticated/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof AuthenticatedCompaniesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/core-cs': {
       id: '/_authenticated/core-cs'
@@ -325,6 +344,7 @@ const AuthenticatedDsaRouteWithChildren =
   AuthenticatedDsaRoute._addFileChildren(AuthenticatedDsaRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
   AuthenticatedCoreCsRoute: typeof AuthenticatedCoreCsRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDsaRoute: typeof AuthenticatedDsaRouteWithChildren
@@ -336,6 +356,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
   AuthenticatedCoreCsRoute: AuthenticatedCoreCsRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDsaRoute: AuthenticatedDsaRouteWithChildren,
