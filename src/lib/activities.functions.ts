@@ -20,7 +20,7 @@ export const logActivity = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("activities")
-      .insert({ user_id: context.userId, ...data });
+      .insert({ user_id: context.userId, ...data, details: data.details as never });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
