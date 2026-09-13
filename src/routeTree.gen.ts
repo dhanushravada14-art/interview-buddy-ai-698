@@ -13,9 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SyllabusRouteImport } from './routes/syllabus'
+import { Route as AuthenticatedCoreCsRouteImport } from './routes/_authenticated/core-cs'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedDsaSlugRouteImport } from './routes/_authenticated/dsa.$slug'
 import { Route as AuthenticatedInterviewSlugRouteImport } from './routes/_authenticated/interview.$slug'
 import { Route as AuthenticatedResultsIdRouteImport } from './routes/_authenticated/results.$id'
 
@@ -38,6 +40,11 @@ const SyllabusRoute = SyllabusRouteImport.update({
   path: '/syllabus',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCoreCsRoute = AuthenticatedCoreCsRouteImport.update({
+  id: '/core-cs',
+  path: '/core-cs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -52,6 +59,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDsaSlugRoute = AuthenticatedDsaSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AuthenticatedDsaRoute,
 } as any)
 const AuthenticatedInterviewSlugRoute =
   AuthenticatedInterviewSlugRouteImport.update({
@@ -69,9 +81,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/core-cs': typeof AuthenticatedCoreCsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/dsa': typeof AuthenticatedDsaRoute
+  '/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
   '/results/$id': typeof AuthenticatedResultsIdRoute
 }
@@ -79,9 +93,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/core-cs': typeof AuthenticatedCoreCsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/dsa': typeof AuthenticatedDsaRoute
+  '/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
+  '/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
   '/results/$id': typeof AuthenticatedResultsIdRoute
 }
@@ -91,9 +107,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/_authenticated/core-cs': typeof AuthenticatedCoreCsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/dsa': typeof AuthenticatedDsaRoute
+  '/_authenticated/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/_authenticated/interview/$slug': typeof AuthenticatedInterviewSlugRoute
   '/_authenticated/results/$id': typeof AuthenticatedResultsIdRoute
 }
@@ -103,9 +121,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/syllabus'
+    | '/core-cs'
     | '/dashboard'
     | '/dsa'
     | '/profile'
+    | '/dsa/$slug'
     | '/interview/$slug'
     | '/results/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -113,9 +133,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/syllabus'
+    | '/core-cs'
     | '/dashboard'
     | '/dsa'
     | '/profile'
+    | '/dsa/$slug'
     | '/interview/$slug'
     | '/results/$id'
   id:
@@ -124,9 +146,11 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/syllabus'
+    | '/_authenticated/core-cs'
     | '/_authenticated/dashboard'
     | '/_authenticated/dsa'
     | '/_authenticated/profile'
+    | '/_authenticated/dsa/$slug'
     | '/_authenticated/interview/$slug'
     | '/_authenticated/results/$id'
   fileRoutesById: FileRoutesById
@@ -168,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SyllabusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/core-cs': {
+      id: '/_authenticated/core-cs'
+      path: '/core-cs'
+      fullPath: '/core-cs'
+      preLoaderRoute: typeof AuthenticatedCoreCsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -189,6 +220,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dsa/$slug': {
+      id: '/_authenticated/dsa/$slug'
+      path: '/$slug'
+      fullPath: '/dsa/$slug'
+      preLoaderRoute: typeof AuthenticatedDsaSlugRouteImport
+      parentRoute: typeof AuthenticatedDsaRoute
+    }
     '/_authenticated/interview/$slug': {
       id: '/_authenticated/interview/$slug'
       path: '/interview/$slug'
@@ -206,17 +244,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedDsaRouteChildren {
+  AuthenticatedDsaSlugRoute: typeof AuthenticatedDsaSlugRoute
+}
+
+const AuthenticatedDsaRouteChildren: AuthenticatedDsaRouteChildren = {
+  AuthenticatedDsaSlugRoute: AuthenticatedDsaSlugRoute,
+}
+
+const AuthenticatedDsaRouteWithChildren =
+  AuthenticatedDsaRoute._addFileChildren(AuthenticatedDsaRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCoreCsRoute: typeof AuthenticatedCoreCsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedDsaRoute: typeof AuthenticatedDsaRoute
+  AuthenticatedDsaRoute: typeof AuthenticatedDsaRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedInterviewSlugRoute: typeof AuthenticatedInterviewSlugRoute
   AuthenticatedResultsIdRoute: typeof AuthenticatedResultsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCoreCsRoute: AuthenticatedCoreCsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedDsaRoute: AuthenticatedDsaRoute,
+  AuthenticatedDsaRoute: AuthenticatedDsaRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedInterviewSlugRoute: AuthenticatedInterviewSlugRoute,
   AuthenticatedResultsIdRoute: AuthenticatedResultsIdRoute,
