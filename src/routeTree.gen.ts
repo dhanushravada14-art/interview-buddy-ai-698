@@ -13,11 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SyllabusRouteImport } from './routes/syllabus'
+import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedCoreCsRouteImport } from './routes/_authenticated/core-cs'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedResumeRouteImport } from './routes/_authenticated/resume'
+import { Route as AuthenticatedSqlRouteImport } from './routes/_authenticated/sql'
 import { Route as AuthenticatedCoreCsSubjectRouteImport } from './routes/_authenticated/core-cs.$subject'
 import { Route as AuthenticatedDsaSlugRouteImport } from './routes/_authenticated/dsa.$slug'
 import { Route as AuthenticatedInterviewSlugRouteImport } from './routes/_authenticated/interview.$slug'
@@ -42,6 +44,11 @@ const SyllabusRoute = SyllabusRouteImport.update({
   path: '/syllabus',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCoreCsRoute = AuthenticatedCoreCsRouteImport.update({
   id: '/core-cs',
   path: '/core-cs',
@@ -65,6 +72,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
 const AuthenticatedResumeRoute = AuthenticatedResumeRouteImport.update({
   id: '/resume',
   path: '/resume',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSqlRoute = AuthenticatedSqlRouteImport.update({
+  id: '/sql',
+  path: '/sql',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCoreCsSubjectRoute =
@@ -94,11 +106,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
   '/core-cs': typeof AuthenticatedCoreCsRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
+  '/sql': typeof AuthenticatedSqlRoute
   '/core-cs/$subject': typeof AuthenticatedCoreCsSubjectRoute
   '/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
@@ -108,11 +122,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
   '/core-cs': typeof AuthenticatedCoreCsRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/resume': typeof AuthenticatedResumeRoute
+  '/sql': typeof AuthenticatedSqlRoute
   '/core-cs/$subject': typeof AuthenticatedCoreCsSubjectRoute
   '/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/interview/$slug': typeof AuthenticatedInterviewSlugRoute
@@ -124,11 +140,13 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/syllabus': typeof SyllabusRoute
+  '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
   '/_authenticated/core-cs': typeof AuthenticatedCoreCsRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/dsa': typeof AuthenticatedDsaRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/resume': typeof AuthenticatedResumeRoute
+  '/_authenticated/sql': typeof AuthenticatedSqlRoute
   '/_authenticated/core-cs/$subject': typeof AuthenticatedCoreCsSubjectRoute
   '/_authenticated/dsa/$slug': typeof AuthenticatedDsaSlugRoute
   '/_authenticated/interview/$slug': typeof AuthenticatedInterviewSlugRoute
@@ -140,11 +158,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/syllabus'
+    | '/companies'
     | '/core-cs'
     | '/dashboard'
     | '/dsa'
     | '/profile'
     | '/resume'
+    | '/sql'
     | '/core-cs/$subject'
     | '/dsa/$slug'
     | '/interview/$slug'
@@ -154,11 +174,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/syllabus'
+    | '/companies'
     | '/core-cs'
     | '/dashboard'
     | '/dsa'
     | '/profile'
     | '/resume'
+    | '/sql'
     | '/core-cs/$subject'
     | '/dsa/$slug'
     | '/interview/$slug'
@@ -169,11 +191,13 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/syllabus'
+    | '/_authenticated/companies'
     | '/_authenticated/core-cs'
     | '/_authenticated/dashboard'
     | '/_authenticated/dsa'
     | '/_authenticated/profile'
     | '/_authenticated/resume'
+    | '/_authenticated/sql'
     | '/_authenticated/core-cs/$subject'
     | '/_authenticated/dsa/$slug'
     | '/_authenticated/interview/$slug'
@@ -217,6 +241,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SyllabusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/companies': {
+      id: '/_authenticated/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof AuthenticatedCompaniesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/core-cs': {
       id: '/_authenticated/core-cs'
       path: '/core-cs'
@@ -250,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/resume'
       fullPath: '/resume'
       preLoaderRoute: typeof AuthenticatedResumeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sql': {
+      id: '/_authenticated/sql'
+      path: '/sql'
+      fullPath: '/sql'
+      preLoaderRoute: typeof AuthenticatedSqlRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/core-cs/$subject': {
@@ -306,21 +344,25 @@ const AuthenticatedDsaRouteWithChildren =
   AuthenticatedDsaRoute._addFileChildren(AuthenticatedDsaRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
   AuthenticatedCoreCsRoute: typeof AuthenticatedCoreCsRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDsaRoute: typeof AuthenticatedDsaRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedResumeRoute: typeof AuthenticatedResumeRoute
+  AuthenticatedSqlRoute: typeof AuthenticatedSqlRoute
   AuthenticatedInterviewSlugRoute: typeof AuthenticatedInterviewSlugRoute
   AuthenticatedResultsIdRoute: typeof AuthenticatedResultsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
   AuthenticatedCoreCsRoute: AuthenticatedCoreCsRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDsaRoute: AuthenticatedDsaRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedResumeRoute: AuthenticatedResumeRoute,
+  AuthenticatedSqlRoute: AuthenticatedSqlRoute,
   AuthenticatedInterviewSlugRoute: AuthenticatedInterviewSlugRoute,
   AuthenticatedResultsIdRoute: AuthenticatedResultsIdRoute,
 }
