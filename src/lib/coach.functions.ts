@@ -27,9 +27,8 @@ export const sendCoachMessage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { getGatewayModel } = await import("./ai-gateway.server");
     const { profileBrief } = await import("./interview.server");
-    const { areaStats, computeReadiness, weakTopics, strengths, type ActivityRow } = await import(
-      "./readiness"
-    );
+    const { areaStats, computeReadiness, weakTopics, strengths } = await import("./readiness");
+    type ActivityRow = import("./readiness").ActivityRow;
 
     const { data: thread, error: threadErr } = await context.supabase
       .from("doubt_threads")
