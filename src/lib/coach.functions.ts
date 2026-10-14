@@ -27,9 +27,7 @@ export const sendCoachMessage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { getGatewayModel } = await import("./ai-gateway.server");
     const { profileBrief } = await import("./interview.server");
-    const { areaStats, computeReadiness, weakTopics, strengths, type ActivityRow } = await import(
-      "./readiness"
-    );
+    const readinessTools = await import("./readiness");
 
     const { data: thread, error: threadErr } = await context.supabase
       .from("doubt_threads")
@@ -58,11 +56,11 @@ export const sendCoachMessage = createServerFn({ method: "POST" })
       ]);
     if (historyErr) throw new Error(historyErr.message);
 
-    const rows = (activities ?? []) as ActivityRow[];
-    const readiness = computeReadiness(rows);
-    const stats = areaStats(rows).filter((s) => s.attempts > 0);
-    const weak = weakTopics(rows).slice(0, 8);
-    const strong = strengths(rows).slice(0, 5);
+    const rows = activities ?? [];
+    const readiness = readinessTools.computeReadiness(rows);
+    const stats = readinessTools.areaStats(rows).filter((s) => s.attempts > 0);
+    const weak = readinessTools.weakTopics(rows).slice(0, 8);
+    const strong = readinessTools.strengths(rows).slice(0, 5);
 
     const skillLevels = (profile?.skill_levels ?? {}) as Record<string, string>;
 
@@ -122,7 +120,7 @@ Instructions:
     });
     if (insertAssistantErr) throw new Error(insertAssistantErr.message);
 
-    const nextTitle = thread.title?.trim()
+    const nextTitle = thread.title?.trim() && thread.title !== "New doubt"
       ? thread.title
       : data.message.slice(0, 60) + (data.message.length > 60 ? "…" : "");
 
