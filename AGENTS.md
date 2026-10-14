@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep authenticated placement tools as route modules under `src/routes/_authenticated/` and place client-callable protected database or AI operations in feature-scoped `src/lib/*.functions.ts` files, so route ownership and auth boundaries stay explicit.
