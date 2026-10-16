@@ -28,3 +28,6 @@ Batch D — Coach + Weak topics + History + Mock
 Final
 - [ ] Dashboard upgrade using readiness + new sections
 - [ ] Typecheck, lint, smoke test existing rounds
+
+Continuation
+- [ ] Clear current typecheck blockers, then finish remaining routes and verify core flows
